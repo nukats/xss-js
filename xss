@@ -42,3 +42,81 @@ FTP Binary (ftp)	No support	Does not support explicit TLS (-starttls ftp)
 SFTP Binary (sftp)	No support	Uses SSH, not FTP/TLS
 cURL (ftp)	curl --ftp-ssl -k ftp://<host>/	Uses --ftp-ssl or --ftp-ssl-control
 Wget (ftp)	wget --ftp-user=user --ftp-password=pass --no-check-certificate --ftps-implicit=on ftp://<host>/	Uses --ftps-implicit=on for FTPS
+
+
+
+user@home:~/folder$ ftp server.com
+Connected to server.com.
+220 (vsFTPd 3.0.5)
+Name (80.nu:nemnuk): bart
+530 Non-anonymous sessions must use encryption.
+ftp: Login failed.
+ftp> quit
+
+lftp -u bart -e 'set ssl:verify-certificate no; set ftp:ssl-allow yes; set ftp:ssl-force yes; set ftp:passive-mode yes; ls; quit' ftp://80.nu
+Password: 
+-rw-r--r--    1 0        0               4 Feb 07 09:55 a.txt
+
+nemnuk@Nems-MacBook-Pro:~/bounty/oauth2-pkce-server$ cat a.py 
+import ftplib
+import ssl
+import socket
+
+# FTPS server credentials and configuration
+hostname = '80.nu'
+username = 'bart'
+password = 'Dupa.123.123'
+
+# Create an FTPS connection
+ftp = ftplib.FTP_TLS()
+
+# Disable SSL certificate verification for self-signed certificates
+ftp.context = ssl.create_default_context()
+ftp.context.check_hostname = False
+ftp.context.verify_mode = ssl.CERT_NONE
+
+try:
+    # Connect to the FTPS server
+    print(f"Connecting to {hostname} on port 21...")
+    ftp.connect(hostname, 21)
+    
+    # Display connection settings (host, port, etc.)
+    print(f"Connected to {hostname}")
+    print(f"Server response: {ftp.getwelcome()}")
+    
+    # Login with provided username and password
+    print(f"Logging in as {username}...")
+    ftp.login(username, password)
+
+    # Secure the connection (switch to TLS)
+    ftp.prot_p()
+
+    # Display connection encryption details (TLS version)
+    tls_info = ftp.sock.getpeercert()
+    cipher = ftp.sock.cipher()
+    print(f"\nTLS Encryption Info:")
+    print(f"  Cipher: {cipher[0]} {cipher[1]}")
+    
+    # List the files in the current directory
+    print("\nFiles on the server:")
+    ftp.retrlines('LIST')
+
+    # Quit the connection
+    ftp.quit()
+
+except Exception as e:
+    print(f"Error: {e}")
+
+nemnuk@Nems-MacBook-Pro:~/bounty/oauth2-pkce-server$ python a.py 
+Connecting to 80.nu on port 21...
+Connected to 80.nu
+Server response: 220 (vsFTPd 3.0.5)
+Logging in as bart...
+
+TLS Encryption Info:
+  Cipher: TLS_AES_256_GCM_SHA384 TLSv1.3
+
+Files on the server:
+-rw-r--r--    1 0        0               4 Feb 07 09:55 a.txt
+nemnuk@Nems-MacBook-Pro:~/bounty/oauth2-pkce-server$ 
+
