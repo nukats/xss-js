@@ -64,8 +64,8 @@ import socket
 
 # FTPS server credentials and configuration
 hostname = '80.nu'
-username = 'bart'
-password = 'Dupa.123.123'
+username = 'xxx'
+password = 'password'
 
 # Create an FTPS connection
 ftp = ftplib.FTP_TLS()
