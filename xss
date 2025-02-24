@@ -1,122 +1,48 @@
-listen=YES
-listen_ipv6=NO
-anonymous_enable=NO
-local_enable=YES
-write_enable=YES
-dirmessage_enable=YES
-use_localtime=YES
-xferlog_enable=YES
-secure_chroot_dir=/var/run/vsftpd/empty
-pam_service_name=vsftpd
-rsa_cert_file=/etc/ssl/private/vsftpd.pem
-rsa_private_key_file=/etc/ssl/private/vsftpd.pem
-ssl_enable=YES
+#!/usr/bin/env python3
+from OpenSSL import SSL
+from pyftpdlib.authorizers import DummyAuthorizer
+from pyftpdlib.handlers import TLS_FTPHandler
+from pyftpdlib.servers import FTPServer
 
-ssl_tlsv1=YES
-ssl_sslv2=NO
-ssl_sslv3=NO
+class ImplicitTLS_FTPHandler(TLS_FTPHandler):
+    def on_connect(self):
+        # In implicit mode, wrap the socket immediately (before sending any banner)
+        if self.implicit_ftps:
+            try:
+                self.secure_connection(self.ssl_context)
+            except Exception as e:
+                self.log_error("Failed to secure connection: %s" % e)
+                self.close()
+                return
+        # Call parent hook (it won’t send banner until later)
+        super().on_connect()
 
-force_local_logins_ssl=YES
-force_local_data_ssl=YES
-ssl_ciphers=HIGH
-require_ssl_reuse=NO
-allow_anon_ssl=NO
-pasv_enable=YES
-pasv_min_port=40000
-pasv_max_port=50000
+def main():
+    # Set up a dummy user
+    authorizer = DummyAuthorizer()
+    authorizer.add_user("user1", "pass1", ".", perm="elradfmw")
 
+    # Use our custom handler
+    handler = ImplicitTLS_FTPHandler
+    handler.authorizer = authorizer
 
-Client	Command/Code Changes to Support -starttls ftp or Secure FTP	Notes
-OpenSSL (s_client)	openssl s_client -connect <host>:21 -starttls ftp	Direct support for -starttls ftp
-Python (ftplib, ssl)	Use FTP_TLS from ftplib	Python's ftplib.FTP_TLS enables implicit and explicit TLS
-Python (pyOpenSSL)	ctx.set_tlsext_host_name(host) with starttls_ftp()	Requires pyOpenSSL and manual TLS handshake
-Perl (Net::FTPSSL)	use Net::FTPSSL; my $ftps = Net::FTPSSL->new($host, Encryption => 'E')	Supports explicit TLS with Encryption => 'E'
-Bash (lftp)	lftp -e "set ftp:ssl-force true; open <host>"	Uses lftp for explicit FTP over TLS
-Bash (curl)	curl --ftp-ssl -k -v ftp://<host>/	Supports --ftp-ssl for FTP over TLS
-Java (Apache Commons Net)	FTPClient ftp = new FTPSClient(); ftp.connect(host); ftp.execPBSZ(0); ftp.execPROT("P");	Uses FTPSClient for explicit TLS
-Java (JSCH)	Not supported	JSCH is for SFTP (SSH-based, not FTP with TLS)
-PowerShell (.NET FTP)	$ftp = [System.Net.FtpWebRequest]::Create("ftp://<host>/")
-$ftp.EnableSsl = $true	Uses .NET FtpWebRequest with TLS
-PowerShell (WinSCP)	winscp.com /command "open ftpes://user:pass@<host>"	Uses explicit TLS (ftpes://)
-FTP Binary (ftp)	No support	Does not support explicit TLS (-starttls ftp)
-SFTP Binary (sftp)	No support	Uses SSH, not FTP/TLS
-cURL (ftp)	curl --ftp-ssl -k ftp://<host>/	Uses --ftp-ssl or --ftp-ssl-control
-Wget (ftp)	wget --ftp-user=user --ftp-password=pass --no-check-certificate --ftps-implicit=on ftp://<host>/	Uses --ftps-implicit=on for FTPS
+    # Create a pyOpenSSL SSL context for TLS
+    ssl_context = SSL.Context(SSL.TLS_SERVER_METHOD)
+    ssl_context.use_certificate_file("server.crt")
+    ssl_context.use_privatekey_file("server.key")
+    handler.ssl_context = ssl_context
 
+    # Require TLS on both control and data channels
+    handler.tls_control_required = True
+    handler.tls_data_required = True
 
+    # Enable implicit FTPS so the TLS handshake is done immediately
+    handler.implicit_ftps = True
 
-user@home:~/folder$ ftp server.com
-Connected to server.com.
-220 (vsFTPd 3.0.5)
-Name (80.nu:nemnuk): bart
-530 Non-anonymous sessions must use encryption.
-ftp: Login failed.
-ftp> quit
+    # Bind on all interfaces, port 990 (the standard for implicit FTPS)
+    server = FTPServer(("0.0.0.0", 990), handler)
+    print("Starting implicit FTPS server on 0.0.0.0:990...")
+    server.serve_forever()
 
-lftp -u bart -e 'set ssl:verify-certificate no; set ftp:ssl-allow yes; set ftp:ssl-force yes; set ftp:passive-mode yes; ls; quit' ftp://80.nu
-Password: 
--rw-r--r--    1 0        0               4 Feb 07 09:55 a.txt
-
-nemnuk@Nems-MacBook-Pro:~/bounty/oauth2-pkce-server$ cat a.py 
-import ftplib
-import ssl
-import socket
-
-# FTPS server credentials and configuration
-hostname = '80.nu'
-username = 'xxx'
-password = 'password'
-
-# Create an FTPS connection
-ftp = ftplib.FTP_TLS()
-
-# Disable SSL certificate verification for self-signed certificates
-ftp.context = ssl.create_default_context()
-ftp.context.check_hostname = False
-ftp.context.verify_mode = ssl.CERT_NONE
-
-try:
-    # Connect to the FTPS server
-    print(f"Connecting to {hostname} on port 21...")
-    ftp.connect(hostname, 21)
-    
-    # Display connection settings (host, port, etc.)
-    print(f"Connected to {hostname}")
-    print(f"Server response: {ftp.getwelcome()}")
-    
-    # Login with provided username and password
-    print(f"Logging in as {username}...")
-    ftp.login(username, password)
-
-    # Secure the connection (switch to TLS)
-    ftp.prot_p()
-
-    # Display connection encryption details (TLS version)
-    tls_info = ftp.sock.getpeercert()
-    cipher = ftp.sock.cipher()
-    print(f"\nTLS Encryption Info:")
-    print(f"  Cipher: {cipher[0]} {cipher[1]}")
-    
-    # List the files in the current directory
-    print("\nFiles on the server:")
-    ftp.retrlines('LIST')
-
-    # Quit the connection
-    ftp.quit()
-
-except Exception as e:
-    print(f"Error: {e}")
-
-nemnuk@Nems-MacBook-Pro:~/bounty/oauth2-pkce-server$ python a.py 
-Connecting to 80.nu on port 21...
-Connected to 80.nu
-Server response: 220 (vsFTPd 3.0.5)
-Logging in as bart...
-
-TLS Encryption Info:
-  Cipher: TLS_AES_256_GCM_SHA384 TLSv1.3
-
-Files on the server:
--rw-r--r--    1 0        0               4 Feb 07 09:55 a.txt
-nemnuk@Nems-MacBook-Pro:~/bounty/oauth2-pkce-server$ 
-
+if __name__ == '__main__':
+    main()
