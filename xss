@@ -6,7 +6,6 @@ from pyftpdlib.servers import FTPServer
 
 class ImplicitTLS_FTPHandler(TLS_FTPHandler):
     def on_connect(self):
-        # In implicit mode, wrap the socket immediately (before sending any banner)
         if self.implicit_ftps:
             try:
                 self.secure_connection(self.ssl_context)
@@ -14,32 +13,25 @@ class ImplicitTLS_FTPHandler(TLS_FTPHandler):
                 self.log_error("Failed to secure connection: %s" % e)
                 self.close()
                 return
-        # Call parent hook (it won’t send banner until later)
         super().on_connect()
 
 def main():
-    # Set up a dummy user
     authorizer = DummyAuthorizer()
     authorizer.add_user("user1", "pass1", ".", perm="elradfmw")
 
-    # Use our custom handler
     handler = ImplicitTLS_FTPHandler
     handler.authorizer = authorizer
 
-    # Create a pyOpenSSL SSL context for TLS
     ssl_context = SSL.Context(SSL.TLS_SERVER_METHOD)
     ssl_context.use_certificate_file("server.crt")
     ssl_context.use_privatekey_file("server.key")
     handler.ssl_context = ssl_context
 
-    # Require TLS on both control and data channels
     handler.tls_control_required = True
     handler.tls_data_required = True
 
-    # Enable implicit FTPS so the TLS handshake is done immediately
     handler.implicit_ftps = True
 
-    # Bind on all interfaces, port 990 (the standard for implicit FTPS)
     server = FTPServer(("0.0.0.0", 990), handler)
     print("Starting implicit FTPS server on 0.0.0.0:990...")
     server.serve_forever()
