@@ -1,0 +1,17 @@
+Cipher Suite	Windows 10 (Default)	Windows 11 (Default)	Recommendation
+TLS_AES_256_GCM_SHA384	No	Yes	Recommended
+TLS_AES_128_GCM_SHA256	No	Yes	Recommended
+TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384	Yes	Yes	Recommended
+TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256	Yes	Yes	Recommended
+TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384	Yes	Yes	Recommended
+TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256	Yes	Yes	Recommended
+TLS_DHE_RSA_WITH_AES_256_GCM_SHA384	No	Yes	Recommended
+TLS_DHE_RSA_WITH_AES_128_GCM_SHA256	No	Yes	Recommended
+TLS_RSA_WITH_AES_256_GCM_SHA384	No	No	Not recommended
+TLS_RSA_WITH_AES_128_GCM_SHA256	No	No	Not recommended
+TLS_RSA_WITH_AES_256_CBC_SHA	Yes	No	Not recommended
+TLS_RSA_WITH_AES_128_CBC_SHA	Yes	No	Not recommended
+
+https://learn.microsoft.com/en-us/windows/win32/secauthn/tls-cipher-suites-in-windows-10-v1511
+
+https://learn.microsoft.com/en-us/windows/win32/secauthn/tls-cipher-suites-in-windows-11
