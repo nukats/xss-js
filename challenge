@@ -1,0 +1,11 @@
+var value = getQUeryString('url')
+var hostName = new URL(value).hostname;
+var WhiteList = ['www.example.com', 'example.com'];
+var pattern = /^www\.example2\.com$/;
+if (!hostName || !(pattern.test(hostName) || WhiteList.includes(hostName))) {
+  return;
+};
+if (!value.toUpperCase().startsWith("HTTP")) {
+  value = "https://" + value;
+}
+window.location.href = value;
