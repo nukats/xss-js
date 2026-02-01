@@ -16,7 +16,7 @@ Systematically reverse engineer binaries and components to discover and validate
 
 - Strong OS fundamentals (process, memory, syscalls, file formats).
 - Proficiency in at least C/C++ and one scripting language (Python preferred).
-- Familiarity with exploitation primitives (stack/heap, info‑leaks, ROP). [web:5][web:8]
+- Familiarity with exploitation primitives (stack/heap, info‑leaks, ROP, gadgets, chains). [web:5][web:8]
 
 ## Required Skills
 
@@ -39,7 +39,7 @@ Systematically reverse engineer binaries and components to discover and validate
 
 1. Scoping and Recon
    - Identify target binary, environment, and threat model.
-   - Collect all available inputs (samples, configs, PCAPs, firmware images, symbols). [web:1][web:3]
+   - Collect all available inputs (samples, configs, PCAPs, firmware images, symbols, communication and network stack, ie. Network/Web Interfaces and communication protocols). [web:1][web:3]
 
 2. Triage and Surface Mapping
    - Classify binary type, architecture, protections (RELRO, NX, PIE, canaries).
